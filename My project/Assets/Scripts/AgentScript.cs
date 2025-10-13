@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = 20f;
+        agent.speed = 12.0f;
     }
 
     void Update()
