@@ -4,28 +4,31 @@ using UnityEngine.AI;
 public class RandomSpawn : MonoBehaviour
 {
     [Header("Referencias")]
-    public GameObject suelo;                 // Plano/terreno donde caminan
-    public GameObject playerPrefab;          // Opcional: si quieres instanciar
-    public GameObject enemyPrefab;           // Opcional: si quieres instanciar
+    public GameObject suelo;                 // Plano o terreno donde caminan
+    public GameObject playerPrefab;          // Prefab opcional del Player
+    public GameObject enemyPrefab;           // Prefab opcional del Enemigo
     public bool instantiateIfMissing = false;
 
-    [Header("Parámetros")]
+    [Header("Parámetros de Spawn")]
     public float minSeparation = 5f;         // Distancia mínima entre Player y Enemy
     public int maxTries = 30;                // Intentos para encontrar puntos válidos
-    public float sampleRadius = 8f;          // Radio para NavMesh.SamplePosition
+    public float sampleRadius = 8f;          // Radio de búsqueda para NavMesh.SamplePosition
+    public float safeCheckRadius = 0.5f;     // Radio para comprobar si hay colisiones cerca
+    public float yOffset = 0.2f;             // Altura extra para evitar hundirse en el suelo
+    public LayerMask obstacleMask;           // Capas que se consideran obstáculos (configura en el Inspector)
 
     private Transform playerT;
     private Transform enemyT;
 
     void Awake()
     {
-        // Obtén/instancia Player
+        // Obtén o instancia Player
         var existingPlayer = FindFirstObjectByType<Player>();
         if (existingPlayer != null) playerT = existingPlayer.transform;
         else if (instantiateIfMissing && playerPrefab != null)
             playerT = Instantiate(playerPrefab).transform;
 
-        // Obtén/instancia Enemy
+        // Obtén o instancia Enemy
         var existingEnemy = FindFirstObjectByType<EnemyScript>();
         if (existingEnemy != null) enemyT = existingEnemy.transform;
         else if (instantiateIfMissing && enemyPrefab != null)
@@ -76,7 +79,7 @@ public class RandomSpawn : MonoBehaviour
             return;
         }
 
-        // Coloca/warp
+        // Coloca o mueve a los agentes
         if (playerT != null) WarpTo(playerT, p1, randomYaw: true);
         if (enemyT != null) WarpTo(enemyT, p2, randomYaw: true);
     }
@@ -85,7 +88,7 @@ public class RandomSpawn : MonoBehaviour
     {
         result = Vector3.zero;
 
-        // Bounds del suelo (Renderer o Collider)
+        // Obtener límites del suelo (Renderer o Collider)
         Bounds b;
         if (suelo.TryGetComponent<Renderer>(out var rend)) b = rend.bounds;
         else if (suelo.TryGetComponent<Collider>(out var col)) b = col.bounds;
@@ -95,21 +98,28 @@ public class RandomSpawn : MonoBehaviour
             return false;
         }
 
-        // Varios intentos de muestreo
+        // Intentos de muestreo aleatorio
         for (int i = 0; i < maxTries; i++)
         {
             var candidate = new Vector3(
                 Random.Range(b.min.x, b.max.x),
-                b.center.y + 2f, // un poco por encima del suelo
+                b.center.y + 2f, // Un poco por encima del suelo
                 Random.Range(b.min.z, b.max.z)
             );
 
             if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, sampleRadius, NavMesh.AllAreas))
             {
-                result = hit.position;
-                return true;
+                Vector3 finalPos = hit.position + Vector3.up * yOffset;
+
+                // Comprobar si hay algún obstáculo cerca del punto
+                if (!Physics.CheckSphere(finalPos, safeCheckRadius, obstacleMask))
+                {
+                    result = finalPos;
+                    return true;
+                }
             }
         }
+
         return false;
     }
 
@@ -128,7 +138,7 @@ public class RandomSpawn : MonoBehaviour
         {
             if (!agent.enabled) agent.enabled = true;
             agent.Warp(pos);
-            agent.ResetPath(); // limpia path anterior por si acaso
+            agent.ResetPath(); // Limpia path anterior
         }
         else
         {
