@@ -1,0 +1,241 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9064180951512211908
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 5
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Skybox
+  m_Shader: {fileID: 104, guid: 0000000000000000f000000000000000, type: 0}
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BackTex:
+        m_Texture: {fileID: 2800000, guid: 8577f049d9a4c244184af16183ae5e4a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Background_Image:
+        m_Texture: {fileID: 2800000, guid: 303e4e117735f5e46803c10d0d333fbb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DownTex:
+        m_Texture: {fileID: 2800000, guid: a7a3040877b29d848bc09be47447dcdc, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FrontTex:
+        m_Texture: {fileID: 2800000, guid: cfaf7032fea684045947c5fb17ee3418, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LeftTex:
+        m_Texture: {fileID: 2800000, guid: e7816c7e812c3694d8b2e1ed1bb59783, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Planet_Texture:
+        m_Texture: {fileID: 2800000, guid: 303e4e117735f5e46803c10d0d333fbb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RightTex:
+        m_Texture: {fileID: 2800000, guid: a002149e5159dbc4f96a03b71c3b86da, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Sun_Texture_Cutout:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _UpTex:
+        m_Texture: {fileID: 2800000, guid: d39a7313bde193a4896005e7bedb9303, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Activate_Aurora: 0
+    - _Activate_Clouds: 1
+    - _Activate_Galaxy_Band: 0
+    - _Activate_Nebula: 0
+    - _Activate_Stars: 0
+    - _Activate_Sun_Source: 1
+    - _AlphaClip: 0
+    - _Aurora_Distance_Fade: 2.23
+    - _Aurora_Distortion_Speed: 0
+    - _Aurora_Gradient_Offset: 0
+    - _Aurora_Intensity: 1
+    - _Aurora_Noise_Scale: 20
+    - _Aurora_Power: 1
+    - _Aurora_Twirl_Strength: 0.04
+    - _Background_Blend: 1
+    - _Blend: 0
+    - _Bottom_Color_Blend_Power: 1
+    - _BumpScale: 1
+    - _ClearCoatMask: 0
+    - _ClearCoatSmoothness: 0
+    - _Cloud_Distance_Fade: 1.22
+    - _Cloud_Scale: 10
+    - _Cloud_Threshold: 1
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DetailAlbedoMapScale: 1
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _EnvironmentReflections: 1
+    - _Exposure: 0.54
+    - _Galaxy_Band_Bottom_Barrier: 0.01
+    - _Galaxy_Band_Nebula_Distance_Fade: 1
+    - _Galaxy_Band_Nebula_Power: 1.07
+    - _Galaxy_Band_Nebula_Size_1: 20
+    - _Galaxy_Band_Nebula_Size_2: 20
+    - _Galaxy_Band_Star_Distance_Threshold: 1
+    - _Galaxy_Band_Star_Power: 60
+    - _Galaxy_Band_Star_Size_and_Amount: 20
+    - _Galaxy_Band_Top_Barrier: 0.99
+    - _GlossMapScale: 0
+    - _Glossiness: 0
+    - _GlossyReflections: 0
+    - _Halve_Skybox: 1
+    - _Metallic: 0
+    - _Nebula_Distance_Fade: 1
+    - _Nebula_Power: 1.07
+    - _Nebula_Size_1: 11.2
+    - _Nebula_Size_2: 20
+    - _OcclusionStrength: 1
+    - _Parallax: 0.005
+    - _Planet_Blend: 1
+    - _Planet_Power: 1
+    - _Planet_Radius: 2
+    - _Planet_Visibility_Gradient: 50
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
+    - _Rotation: 0
+    - _Smoothness: 0.5
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _Star_Distance_Fade: 1
+    - _Star_Sparkling_Speed: 10
+    - _Stars_Amount_and_Size: 20
+    - _Stars_Visibility: 60
+    - _Sun_Size: 0.37
+    - _Surface: 0
+    - _Top_Color_Blend_Power: 1
+    - _WorkflowMode: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _Aurora_Color_1: {r: 0.4345407, g: 0.8773585, b: 0.8531066, a: 0}
+    - _Aurora_Color_2: {r: 0.8703894, g: 0.9811321, b: 0.3933784, a: 0}
+    - _Aurora_Distortion_Min_and_Max: {r: 10, g: 12, b: 0, a: 0}
+    - _Aurora_Speed: {r: 0, g: 0, b: 0, a: 0}
+    - _Aurora_Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _Aurora_Twirl_Offset: {r: 0, g: 0, b: 0, a: 0}
+    - _Background_Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Background_Offset: {r: 0, g: 0, b: 0, a: 0}
+    - _Background_Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Bottom_Color: {r: 0.44139373, g: 0.8542296, b: 0.8584906, a: 0}
+    - _Cloud_Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Cloud_Direction: {r: 10, g: 10, b: 0, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Galaxy_Band_Nebula_Color_1: {r: 0.7968752, g: 0.0518868, b: 1, a: 0}
+    - _Galaxy_Band_Nebula_Color_2: {r: 0.9245283, g: 0.7670505, b: 0.0305269, a: 0}
+    - _Galaxy_Band_Star_Color_Bottom: {r: 1, g: 1, b: 1, a: 0}
+    - _Galaxy_Band_Star_Color_Top: {r: 0.02830189, g: 0.0273674, b: 0.0273674, a: 0}
+    - _Middle_Color: {r: 1, g: 0.6367924, b: 0.9564631, a: 0}
+    - _Nebula_Color_1: {r: 0.7968752, g: 0.0518868, b: 1, a: 0}
+    - _Nebula_Color_2: {r: 0.9245283, g: 0.7670505, b: 0.0305269, a: 0}
+    - _Planet_Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Planet_Position: {r: -10, g: -6, b: 0, a: 0}
+    - _Planet_Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _Star_Color: {r: 222.861, g: 222.861, b: 222.861, a: 0}
+    - _Stars_Tiling: {r: 10, g: 10, b: 0, a: 0}
+    - _Sun_Color_Bottom: {r: 0.9433962, g: 0.7472131, b: 0.6007476, a: 0}
+    - _Sun_Color_Gradient_Offset: {r: 0, g: 0, b: 0, a: 0}
+    - _Sun_Color_Top: {r: 1, g: 0.4273499, b: 0, a: 0}
+    - _Sun_Cutout_Texture_Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _Sun_Gradient_Tiling: {r: 1, g: 1, b: 0, a: 0}
+    - _Tint: {r: 0.7971698, g: 1, b: 0.9600149, a: 0.5}
+    - _Top_Color: {r: 0.495283, g: 1, b: 0.6410149, a: 0}
+  m_BuildTextureStacks: []
