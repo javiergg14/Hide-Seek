@@ -4,23 +4,43 @@ using UnityEngine.AI;
 public class Player : MonoBehaviour
 {
     private NavMeshAgent agent;
+    private Animator animator;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = 12.0f;
+        animator = GetComponent<Animator>();
+
+        agent.speed = 2.5f;              // velocidad de caminata humana (~2–3 m/s)
+        agent.acceleration = 3.0f;       // arranque y frenado suaves
+        agent.angularSpeed = 200.0f;     // giros más lentos y naturales
+        agent.stoppingDistance = 0.3f;  // deja de moverse justo antes del destino
     }
 
     void Update()
     {
-        if (Input.GetMouseButton(0))
+        // Movimiento con clic
+        if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 agent.SetDestination(hit.point);
             }
+        }
+
+        // Control de animación si hay Animator
+        if (animator != null)
+        {
+            float speedPercent = agent.velocity.magnitude / agent.speed;
+            animator.SetFloat("Speed", speedPercent, 0.1f, Time.deltaTime);
+        }
+
+        // Suavizar rotación manual si no quieres depender del NavMeshAgent
+        if (agent.velocity.sqrMagnitude > 0.1f)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(agent.velocity.normalized);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         }
     }
 }
