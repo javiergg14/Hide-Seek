@@ -1,38 +1,25 @@
 using UnityEngine;
 
-public class CameraMovement : MonoBehaviour
+public class CameraFollow : MonoBehaviour
 {
-    public float speed = 5f;          // Velocidad de movimiento
-    public float rotationSpeed = 100f; // Velocidad de rotación (Q y E)
+    public Transform player;      // El objeto que la cámara debe seguir
+    public Vector3 offset;        // Distancia desde el jugador
+    public float smoothSpeed = 0.125f; // Suavidad del movimiento
 
-    void Update()
+    void LateUpdate()
     {
-        // Inputs de movimiento
-        float moveX = Input.GetAxis("Horizontal"); // A, D
-        float moveZ = Input.GetAxis("Vertical");   // W, S
+        if (player == null) return;
 
-        // Movimiento relativo a la cámara
-        Vector3 forward = transform.forward;
-        Vector3 right = transform.right;
+        // Posición deseada = posición del jugador + offset
+        Vector3 desiredPosition = player.position + offset;
 
-        // Ignoramos el eje Y (para que no se mueva hacia arriba/abajo)
-        forward.y = 0f;
-        right.y = 0f;
+        // Movimiento suave hacia la posición deseada
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
 
-        forward.Normalize();
-        right.Normalize();
+        // Aplica la posición
+        transform.position = smoothedPosition;
 
-        // Dirección final de movimiento
-        Vector3 move = (forward * moveZ + right * moveX).normalized;
-
-        // Aplicar movimiento
-        transform.position += move * speed * Time.deltaTime;
-
-        // Rotación con Q y E en el eje Y
-        if (Input.GetKey(KeyCode.Q))
-            transform.Rotate(Vector3.up, -rotationSpeed * Time.deltaTime, Space.World);
-
-        if (Input.GetKey(KeyCode.E))
-            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
+        // (Opcional) Mantiene la rotación fija de la cámara (por ejemplo, la que tienes ahora)
+        transform.rotation = Quaternion.Euler(47.417f, 364.251f, 5.681f);
     }
 }
