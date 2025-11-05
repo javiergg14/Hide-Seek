@@ -29,13 +29,6 @@ public class Player : MonoBehaviour
             }
         }
 
-        // Control de animación si hay Animator
-        if (animator != null)
-        {
-            float speedPercent = agent.velocity.magnitude / agent.speed;
-            animator.SetFloat("Speed", speedPercent, 0.1f, Time.deltaTime);
-        }
-
         // Suavizar rotación manual si no quieres depender del NavMeshAgent
         if (agent.velocity.sqrMagnitude > 0.1f)
         {

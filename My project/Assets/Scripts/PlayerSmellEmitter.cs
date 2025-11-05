@@ -1,43 +1,47 @@
 using UnityEngine;
+using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class PlayerSmellEmitter : MonoBehaviour
 {
-    [Header("Prefab & reglas")]
-    public GameObject bloodPrefab;        // Prefab "BloodMarker" con tag SmellSource
-    public float minInterval = 1f;
-    public float maxInterval = 2f;
+    public GameObject bloodSmellPrefab;
+    public float minInterval = 1.0f;
+    public float maxInterval = 2.0f;
+    public float minSpeedToEmit = 0.1f;
+    public int maxActiveSmells = 2;   
 
-    [Header("Movimiento")]
-    public float minDistanceBetweenDrops = 0.75f; // distancia mínima recorrida para soltar otra gota
-    public float moveEpsilon = 0.01f;             // umbral para considerar que te mueves
-    public float dropOffsetY = 0.05f;
+    NavMeshAgent agent;
+    float nextDropTime;
+    List<GameObject> activeSmells = new List<GameObject>();
 
-    private float nextTime;
-    private Vector3 lastDropPos;
-    private bool hasDroppedOnce = false;
-
-    void Start() { ScheduleNext(); }
+    void Start()
+    {
+        agent = GetComponent<NavMeshAgent>();
+        ScheduleNext();
+    }
 
     void Update()
     {
-        // ¿Te estás moviendo realmente?
-        float moved = (transform.position - (hasDroppedOnce ? lastDropPos : transform.position)).sqrMagnitude;
+        activeSmells.RemoveAll(s => s == null);
 
-        bool movedEnough = moved >= (hasDroppedOnce ? minDistanceBetweenDrops * minDistanceBetweenDrops : moveEpsilon);
+        if (agent.velocity.sqrMagnitude < minSpeedToEmit * minSpeedToEmit)
+            return;
 
-        if (Time.time >= nextTime && movedEnough)
+        if (Time.time >= nextDropTime && activeSmells.Count < maxActiveSmells)
         {
-            Vector3 p = transform.position; p.y += dropOffsetY;
-            Instantiate(bloodPrefab, p, Quaternion.identity);
+            var newSmell = Instantiate(
+                bloodSmellPrefab,
+                transform.position + Vector3.down * 0.1f,
+                Quaternion.identity
+            );
 
-            lastDropPos = transform.position;
-            hasDroppedOnce = true;
+            activeSmells.Add(newSmell);
             ScheduleNext();
         }
     }
 
     void ScheduleNext()
     {
-        nextTime = Time.time + Random.Range(minInterval, maxInterval);
+        nextDropTime = Time.time + Random.Range(minInterval, maxInterval);
     }
 }
