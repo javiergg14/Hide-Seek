@@ -1,25 +1,35 @@
 using UnityEngine;
 
-public class CameraFollow : MonoBehaviour
+public class PlayerCameraFollow : MonoBehaviour
 {
-    public Transform player;      // El objeto que la cámara debe seguir
-    public Vector3 offset;        // Distancia desde el jugador
-    public float smoothSpeed = 0.125f; // Suavidad del movimiento
+    [Header("Objetivo a seguir")]
+    public Transform target;         // Arrastra aquí el Player
+
+    [Header("Posición de la cámara")]
+    public Vector3 offset = new Vector3(0f, 5f, -6f);  // distancia respecto al jugador
+
+    [Header("Rotación")]
+    public bool lookAtTarget = true; // Si la cámara mira al jugador
+    public float rotationSmooth = 5f;
+
+    [Header("Movimiento suave")]
+    public float smoothSpeed = 8f;   // velocidad de seguimiento
 
     void LateUpdate()
     {
-        if (player == null) return;
+        if (!target) return;
 
-        // Posición deseada = posición del jugador + offset
-        Vector3 desiredPosition = player.position + offset;
+        // Posición deseada según el offset relativo al jugador
+        Vector3 desiredPosition = target.position + offset;
 
-        // Movimiento suave hacia la posición deseada
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+        // Movimiento suave con interpolación
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
 
-        // Aplica la posición
-        transform.position = smoothedPosition;
-
-        // (Opcional) Mantiene la rotación fija de la cámara (por ejemplo, la que tienes ahora)
-        transform.rotation = Quaternion.Euler(47.417f, 364.251f, 5.681f);
+        // Rotación hacia el jugador (opcional)
+        if (lookAtTarget)
+        {
+            Quaternion desiredRot = Quaternion.LookRotation(target.position - transform.position);
+            transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, rotationSmooth * Time.deltaTime);
+        }
     }
 }
