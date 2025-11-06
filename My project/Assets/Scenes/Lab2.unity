@@ -446,7 +446,7 @@ MonoBehaviour:
   player: {fileID: 1989302097}
   playerCamera: {fileID: 1638090717}
   navmeshProjectMaxDist: 5
-  exclusionRadiusFromPlayer: 30
+  exclusionRadiusFromPlayer: 50
   spawnOnStart: 1
   maxTriesPerZombie: 40
 --- !u!4 &1047222658
@@ -602,7 +602,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400056, guid: 8c53cffd52097cf4582f0a090c9a833e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.4
+      value: 22.78
       objectReference: {fileID: 0}
     - target: {fileID: 400056, guid: 8c53cffd52097cf4582f0a090c9a833e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -610,7 +610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400056, guid: 8c53cffd52097cf4582f0a090c9a833e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.85
+      value: -23.19
       objectReference: {fileID: 0}
     - target: {fileID: 400056, guid: 8c53cffd52097cf4582f0a090c9a833e, type: 3}
       propertyPath: m_LocalRotation.w
