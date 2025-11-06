@@ -2,12 +2,12 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class Zombie : MonoBehaviour
+public class ZombieController : MonoBehaviour
 {
     [Header("Referencias")]
     public Transform player;
     public Camera playerCamera;
-    public BoxCollider patrolArea;         // Área para patrulla y para elegir destinos random
+    public BoxCollider patrolArea;
 
     [Header("Velocidades")]
     public float wanderSpeed = 1.5f;
@@ -18,21 +18,30 @@ public class Zombie : MonoBehaviour
     public float wanderIntervalMax = 4.0f;
 
     [Header("Persecución")]
-    public float maxChaseDistance = 40f;   // si se aleja demasiado del jugador, vuelve a patrullar
+    public float maxChaseDistance = 40f;
 
     [Header("Comunicación")]
-    public float alertRadius = 15f;        // radio para avisar a otros zombies
-    public float alertCooldown = 2.0f;     // para no spamear avisos
-    public LayerMask zombieLayer;          // opcional: capa "Zombie" para filtrar
-    public string zombieTag = "Zombie";    // opcional: tag para filtrar
+    public float alertRadius = 15f;
+    public float alertCooldown = 2.0f;
+    public LayerMask zombieLayer;
+    public string zombieTag = "Zombie";
+
+    [Header("Smell / Olor")]
+    public float smellMemorySeconds = 5f; // cuánto recuerda el último olor
 
     [Header("Animación (opcional)")]
-    public Animator animator;              // parámetros sugeridos: "Speed"(float), "Alert"(bool)
+    public Animator animator;
 
+    // --- internos ---
     private NavMeshAgent agent;
     private float nextWanderTime;
-    private bool isChasing;
+    private bool isChasing; // estado de persecución por visión
     private float nextAlertTime;
+
+    // memoria del olor (posición + caducidad)
+    private bool hasSmellTarget;
+    private Vector3 smellTarget;
+    private float smellExpireTime;
 
     private Renderer[] renderers;
     private Collider[] colliders;
@@ -41,7 +50,6 @@ public class Zombie : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         if (!animator) animator = GetComponentInChildren<Animator>();
-
         renderers = GetComponentsInChildren<Renderer>();
         colliders = GetComponentsInChildren<Collider>();
 
@@ -52,7 +60,6 @@ public class Zombie : MonoBehaviour
 
     void OnEnable()
     {
-        // Asegurar que arranca en NavMesh
         if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2.0f, NavMesh.AllAreas))
             transform.position = hit.position;
 
@@ -65,12 +72,16 @@ public class Zombie : MonoBehaviour
         if (!agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
         if (!player) return;
 
+        // caducar olor
+        if (hasSmellTarget && Time.time >= smellExpireTime)
+            hasSmellTarget = false;
+
         bool inPlayerView = IsInPlayerFrustum();
         float distToPlayer = Vector3.Distance(transform.position, player.position);
 
         if (inPlayerView)
         {
-            // Entró en frustum -> perseguir + alertar
+            // 1) PRIORIDAD VISIÓN: perseguir siempre
             if (!isChasing)
             {
                 isChasing = true;
@@ -80,9 +91,21 @@ public class Zombie : MonoBehaviour
             }
             agent.SetDestination(player.position);
         }
+        else if (hasSmellTarget)
+        {
+            isChasing = false;
+            if (animator) animator.SetBool("Alert", false);
+
+            agent.speed = Mathf.Max(agent.speed, wanderSpeed);
+            agent.SetDestination(smellTarget);
+
+            // si llegó al olor y no ve al jugador, limpia el objetivo
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.05f)
+                hasSmellTarget = false;
+        }
         else
         {
-            // Si estaba persiguiendo pero ya no se ve y está muy lejos, volver a patrullar
+            // 3) Patrulla por área
             if (isChasing && distToPlayer > maxChaseDistance)
             {
                 isChasing = false;
@@ -90,22 +113,12 @@ public class Zombie : MonoBehaviour
                 ScheduleNextWanderSoon();
             }
 
-            if (!isChasing)
-            {
-                agent.speed = wanderSpeed;
-                HandleWanderInArea();
-            }
-            else
-            {
-                // Sigue en chase aunque no esté en frustum si aún está cerca
-                agent.SetDestination(player.position);
-            }
+            agent.speed = wanderSpeed;
+            HandleWanderInArea();
         }
 
-        // Animación según velocidad
         if (animator) animator.SetFloat("Speed", agent.velocity.magnitude);
 
-        // Orientación suave dependiente de la velocidad
         if (agent.velocity.sqrMagnitude > 0.05f)
         {
             Quaternion look = Quaternion.LookRotation(agent.velocity.normalized, Vector3.up);
@@ -113,7 +126,7 @@ public class Zombie : MonoBehaviour
         }
     }
 
-    // ====== Percepción por frustum de la cámara del jugador ======
+    // ==== Percepción por frustum de la cámara del jugador ====
     bool IsInPlayerFrustum()
     {
         Camera cam = playerCamera ? playerCamera : Camera.main;
@@ -150,12 +163,11 @@ public class Zombie : MonoBehaviour
         return hasAny ? bounds : new Bounds(transform.position, Vector3.zero);
     }
 
-    // ====== Patrulla dentro de un área (cuando NO están en cámara) ======
+    // ==== Patrulla en área ====
     void HandleWanderInArea()
     {
         if (!patrolArea)
         {
-            // fallback: moverse cerca en random si no hay área
             if (Time.time >= nextWanderTime || ReachedDestination())
             {
                 if (RandomPointNear(transform.position, 8f, out Vector3 dest))
@@ -175,7 +187,6 @@ public class Zombie : MonoBehaviour
 
     bool IsDestinationInsideArea(Vector3 pos)
     {
-        // Transformar punto a espacio local del BoxCollider y comprobar si está dentro
         var t = patrolArea.transform;
         Vector3 local = t.InverseTransformPoint(pos) - patrolArea.center;
         Vector3 half = patrolArea.size * 0.5f;
@@ -223,87 +234,57 @@ public class Zombie : MonoBehaviour
         return false;
     }
 
-    void ScheduleNextWander()
-    {
-        nextWanderTime = Time.time + Random.Range(wanderIntervalMin, wanderIntervalMax);
-    }
+    void ScheduleNextWander() => nextWanderTime = Time.time + Random.Range(wanderIntervalMin, wanderIntervalMax);
+    void ScheduleNextWanderSoon() => nextWanderTime = Time.time + Random.Range(0.2f, 0.6f);
+    bool ReachedDestination() { if (agent.pathPending) return false; return agent.remainingDistance <= agent.stoppingDistance + 0.05f; }
 
-    void ScheduleNextWanderSoon()
-    {
-        nextWanderTime = Time.time + Random.Range(0.2f, 0.6f);
-    }
-
-    bool ReachedDestination()
-    {
-        if (agent.pathPending) return false;
-        return agent.remainingDistance <= agent.stoppingDistance + 0.05f;
-    }
-
-    // ====== Comunicación entre zombies ======
+    // ==== Comunicación ====
     void TryAlertNearbyZombies()
     {
         if (Time.time < nextAlertTime) return;
         nextAlertTime = Time.time + alertCooldown;
 
-        // Encuentra "otros" zombies cerca y les envía un mensaje
-        Collider[] hits;
-        if (zombieLayer.value != 0)
-            hits = Physics.OverlapSphere(transform.position, alertRadius, zombieLayer);
-        else
-            hits = Physics.OverlapSphere(transform.position, alertRadius);
+        Collider[] hits = (zombieLayer.value != 0)
+            ? Physics.OverlapSphere(transform.position, alertRadius, zombieLayer)
+            : Physics.OverlapSphere(transform.position, alertRadius);
 
         foreach (var h in hits)
         {
-            if (!h || h.attachedRigidbody && h.attachedRigidbody.gameObject == gameObject) continue;
-
+            if (!h) continue;
             var go = h.attachedRigidbody ? h.attachedRigidbody.gameObject : h.gameObject;
-
-            // Filtro por tag si lo necesitas
-            if (!string.IsNullOrEmpty(zombieTag) && !go.CompareTag(zombieTag)) continue;
             if (go == gameObject) continue;
+            if (!string.IsNullOrEmpty(zombieTag) && !go.CompareTag(zombieTag)) continue;
 
-            // Enviar mensaje al otro zombie: "¡He visto al jugador!"
-            // Usamos SendMessage para ese GameObject concreto.
-            go.SendMessage("OnAllySpottedPlayer",
-                player.position,
-                SendMessageOptions.DontRequireReceiver);
+            go.SendMessage("OnAllySpottedPlayer", player.position, SendMessageOptions.DontRequireReceiver);
         }
-
-        // Además, este zombie avisa a *sus* componentes/hijos (por si hay lógica adicional)
-        BroadcastMessage("OnPlayerSpottedLocal",
-            player.position,
-            SendMessageOptions.DontRequireReceiver);
+        BroadcastMessage("OnPlayerSpottedLocal", player.position, SendMessageOptions.DontRequireReceiver);
     }
 
-    // Recibe aviso de otro zombie
     void OnAllySpottedPlayer(Vector3 lastKnownPlayerPos)
     {
-        // Pasa a alerta/persecución (o al menos a investigar)
+        // No rompe la prioridad: si luego entra al frustum, Update lo forzará a perseguir por visión
         isChasing = true;
         agent.speed = chaseSpeed;
         if (animator) animator.SetBool("Alert", true);
 
-        // Si tenemos player, perseguimos player; si no, ir a la última posición conocida
-        if (player)
-            agent.SetDestination(player.position);
-        else
-            agent.SetDestination(lastKnownPlayerPos);
+        if (player) agent.SetDestination(player.position);
+        else agent.SetDestination(lastKnownPlayerPos);
     }
 
-    // Aviso local (por si quieres efectos, sonidos, etc.)
-    void OnPlayerSpottedLocal(Vector3 pos)
+    // ==== Integración con SmellSensor ====
+    // Llamado por SmellSensor cuando detecta una gota
+    public void OnSmellDetected(Vector3 smellWorldPos)
     {
-        // Aquí puedes reproducir un gruñido, FX, etc.
-        // (Dejamos el método para que BroadcastMessage no falle)
+        hasSmellTarget = true;
+        smellTarget = smellWorldPos;
+        smellExpireTime = Time.time + smellMemorySeconds;
+        // No forzamos aquí SetDestination si está viendo al jugador;
+        // Update resolverá la prioridad (visión > olor).
     }
 
     void OnDrawGizmosSelected()
     {
-        // Radio de alerta
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, alertRadius);
-
-        // Visual del área
+        Gizmos.color = Color.red; Gizmos.DrawWireSphere(transform.position, alertRadius);
         if (patrolArea)
         {
             Gizmos.color = new Color(0.2f, 0.6f, 1f, 0.2f);
@@ -311,6 +292,12 @@ public class Zombie : MonoBehaviour
             Gizmos.DrawCube(patrolArea.center, patrolArea.size);
             Gizmos.color = new Color(0.2f, 0.6f, 1f, 1f);
             Gizmos.DrawWireCube(patrolArea.center, patrolArea.size);
+        }
+
+        if (hasSmellTarget)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(smellTarget + Vector3.up * 0.05f, 0.15f);
         }
     }
 }
